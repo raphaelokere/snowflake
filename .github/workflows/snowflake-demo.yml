@@ -1,4 +1,4 @@
-name: Snowflake SQL Query Demo
+name: Snowflake Query Demo
 
 on:
   push:
@@ -6,23 +6,24 @@ on:
       - main
 
 jobs:
-  snowflake:
+  run-snowflake-query:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Install SnowSQL CLI
+      - name: Download SnowSQL
         run: |
-          sudo apt-get update
-          sudo apt-get install -y snowsql
+          curl -O https://sfc-repo.snowflakecomputing.com/snowsql/bootstrap/1.2/linux_x86_64/snowsql-linux_x86_64
+          chmod +x snowsql-linux_x86_64
+          ./snowsql-linux_x86_64 -n
 
-      - name: Run SQL query on Snowflake
+      - name: Configure SnowSQL
         run: |
-          snowsql -a ${{ secrets.SNOWFLAKE_ACCOUNT }} \
-                  -u ${{ secrets.SNOWFLAKE_USER }} \
-                  -p ${{ secrets.SNOWFLAKE_PASSWORD }} \
-                  -d DEMO_DB \
-                  -s PUBLIC \
-                  -q "SELECT * FROM music_catalog LIMIT 10;"
+          ./snowsql-linux_x86_64 -a ${{ secrets.SNOWFLAKE_ACCOUNT }} \
+                                 -u ${{ secrets.SNOWFLAKE_USER }} \
+                                 -p ${{ secrets.SNOWFLAKE_PASSWORD }} \
+                                 -d DEMO_DB \
+                                 -s PUBLIC \
+                                 -q "@data.sql"
