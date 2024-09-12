@@ -1,22 +1,33 @@
-name: Snowflake Query Demo
+name: Deploy to Snowflake
 
 on:
   push:
     branches:
-      - main
+      - main  # Triggers on every push to the main branch
 
 jobs:
-  run-snowflake-query:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+    - name: Checkout repository
+      uses: actions/checkout@v2
 
-      - name: Install Python Dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install snowflake-connector-python
+    - name: Set up Terraform
+      uses: hashicorp/setup-terraform@v1
+      with:
+        terraform_version: 1.0.5
 
-      - name: Run Snowflake Query with Python
-        run: python run_query.py
+    - name: Setup private key
+      run: |
+        echo "${{ secrets.SNOWFLAKE_PASSWORD }}" > snowflake_private_key.pem
+        chmod 600 snowflake_private_key.pem
+
+    - name: Terraform Init
+      run: terraform init
+
+    - name: Terraform Apply
+      env:
+        SNOWFLAKE_ACCOUNT: ${{ secrets.SNOWFLAKE_ACCOUNT }}
+        SNOWFLAKE_USER: ${{ secrets.SNOWFLAKE_USER }}
+      run: terraform apply -auto-approve
