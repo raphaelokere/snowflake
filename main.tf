@@ -1,15 +1,22 @@
-provider "snowflake" {
-  username = "RAPHAELOKERE"
-  #  account     = "YQB16430.us-east-1"
-  account     = "YQB16430"
-  role        = "ACCOUNTADMIN"
-  private_key = var.snowflake_private_key
+terraform {
+  required_providers {
+    snowflake = {
+      source  = "Snowflake-Labs/snowflake"
+      version = "0.63.0"
+    }
+  }
+}
 
+provider "snowflake" {
+  username       = "RAPHAELOKERE"
+  account        = "YQB16430"
+  role           = "ACCOUNTADMIN"
+  private_key    = var.snowflake_private_key
 }
 
 # Create a Snowflake database
 resource "snowflake_database" "demo_db" {
-  name = "DEMO_DB"
+  name    = "DEMO_DB"
   comment = "Database created by Terraform"
 }
 
@@ -24,6 +31,7 @@ resource "snowflake_table" "demo_table" {
   database = snowflake_database.demo_db.name
   schema   = snowflake_schema.demo_schema.name
   name     = "DEMO_TABLE"
+
   column {
     name = "ID"
     type = "NUMBER"
