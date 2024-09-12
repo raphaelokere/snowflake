@@ -10,19 +10,41 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+    - name: Checkout code
+      uses: actions/checkout@v2
 
-      - name: Run SnowSQL in Docker
-        run: |
-          docker run --rm -v $(pwd):/scripts \
-          -e SNOWFLAKE_ACCOUNT=${{ secrets.SNOWFLAKE_ACCOUNT }} \
-          -e SNOWFLAKE_USER=${{ secrets.SNOWFLAKE_USER }} \
-          -e SNOWFLAKE_PASSWORD=${{ secrets.SNOWFLAKE_PASSWORD }} \
-          snowflakedb/snowsql:latest \
-          snowsql -a $SNOWFLAKE_ACCOUNT \
-                  -u $SNOWFLAKE_USER \
-                  -p $SNOWFLAKE_PASSWORD \
-                  -d DEMO_DB \
-                  -s PUBLIC \
-                  -q "@/scripts/data.sql"
+    - name: Install Python Dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install snowflake-connector-python
+
+    - name: Run Snowflake Query with Python
+      run: |
+        python -c "
+import snowflake.connector
+import os
+
+# Connect to Snowflake
+conn = snowflake.connector.connect(
+    user=os.getenv('SNOWFLAKE_USER'),
+    password=os.getenv('SNOWFLAKE_PASSWORD'),
+    account=os.getenv('SNOWFLAKE_ACCOUNT')
+)
+
+# Create a cursor object
+cur = conn.cursor()
+
+# Execute the query
+cur.execute(open('data.sql').read())
+
+# Fetch the result
+results = cur.fetchall()
+
+# Print the results
+for row in results:
+    print(row)
+
+# Close the cursor and connection
+cur.close()
+conn.close()
+        "
