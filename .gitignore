@@ -1,3 +1,7 @@
 # Ignore TF Vars
 *.tfvars
 *.tfstate
+
+# Ignore .terraform folder
+.terraform/
+
