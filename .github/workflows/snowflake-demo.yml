@@ -26,8 +26,16 @@ jobs:
     - name: Terraform Init
       run: terraform init
 
+    - name: Terraform Plan
+      env:
+        SNOWFLAKE_ACCOUNT: ${{ secrets.SNOWFLAKE_ACCOUNT }}
+        SNOWFLAKE_USER: ${{ secrets.SNOWFLAKE_USER }}
+        TF_VAR_snowflake_private_key: ${{ secrets.SNOWFLAKE_PASSWORD }}  # Pass private key to Terraform
+      run: terraform plan 
+
     - name: Terraform Apply
       env:
         SNOWFLAKE_ACCOUNT: ${{ secrets.SNOWFLAKE_ACCOUNT }}
         SNOWFLAKE_USER: ${{ secrets.SNOWFLAKE_USER }}
+        TF_VAR_snowflake_private_key: ${{ secrets.SNOWFLAKE_PASSWORD }}  # Pass private key to Terraform
       run: terraform apply -auto-approve
