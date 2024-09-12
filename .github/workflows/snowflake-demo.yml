@@ -10,41 +10,13 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-    - name: Install Python Dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install snowflake-connector-python
+      - name: Install Python Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install snowflake-connector-python
 
-    - name: Run Snowflake Query with Python
-      run: |
-        python -c "
-import snowflake.connector
-import os
-
-# Connect to Snowflake
-conn = snowflake.connector.connect(
-    user=os.getenv('SNOWFLAKE_USER'),
-    password=os.getenv('SNOWFLAKE_PASSWORD'),
-    account=os.getenv('SNOWFLAKE_ACCOUNT')
-)
-
-# Create a cursor object
-cur = conn.cursor()
-
-# Execute the query
-cur.execute(open('data.sql').read())
-
-# Fetch the result
-results = cur.fetchall()
-
-# Print the results
-for row in results:
-    print(row)
-
-# Close the cursor and connection
-cur.close()
-conn.close()
-        "
+      - name: Run Snowflake Query with Python
+        run: python run_query.py
