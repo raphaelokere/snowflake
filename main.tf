@@ -11,7 +11,7 @@ provider "snowflake" {
   username       = "RAPHAELOKERE"
   account        = "YQB16430"
   role           = "ACCOUNTADMIN"
-  private_key    = var.snowflake_private_key
+  password    = var.password
 }
 
 # Create a Snowflake database
