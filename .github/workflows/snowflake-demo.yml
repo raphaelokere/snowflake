@@ -13,17 +13,16 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Download and Install SnowSQL
+      - name: Run SnowSQL in Docker
         run: |
-          curl -O https://sfc-repo.snowflakecomputing.com/snowsql/bootstrap/install-latest.sh
-          bash install-latest.sh
-          sudo ~/.snowsql/snowsql -v  # Verify installation
-
-      - name: Run SQL Query
-        run: |
-          sudo ~/.snowsql/snowsql -a ${{ secrets.SNOWFLAKE_ACCOUNT }} \
-                                  -u ${{ secrets.SNOWFLAKE_USER }} \
-                                  -p ${{ secrets.SNOWFLAKE_PASSWORD }} \
-                                  -d DEMO_DB \
-                                  -s PUBLIC \
-                                  -q "@query.sql"
+          docker run --rm -v $(pwd):/scripts \
+          -e SNOWFLAKE_ACCOUNT=${{ secrets.SNOWFLAKE_ACCOUNT }} \
+          -e SNOWFLAKE_USER=${{ secrets.SNOWFLAKE_USER }} \
+          -e SNOWFLAKE_PASSWORD=${{ secrets.SNOWFLAKE_PASSWORD }} \
+          snowflakedb/snowsql:latest \
+          snowsql -a $SNOWFLAKE_ACCOUNT \
+                  -u $SNOWFLAKE_USER \
+                  -p $SNOWFLAKE_PASSWORD \
+                  -d DEMO_DB \
+                  -s PUBLIC \
+                  -q "@/scripts/data.sql"
