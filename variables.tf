@@ -1,4 +1,4 @@
-variable "snowflake_private_key" {
+variable "password" {
   description = "Private key for Snowflake authentication"
   type        = string
   sensitive   = true
